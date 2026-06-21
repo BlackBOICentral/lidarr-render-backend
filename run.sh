@@ -15,9 +15,14 @@ endpoint = https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1/s3
 region = us-east-1
 EOF
 
-# Mount the Supabase bucket directly into the local /data/music directory
+# Mount the Supabase bucket with user 'abc' permissions explicitly opened
 echo "--> Mounting Supabase cloud storage to local directory..."
-rclone mount supabase:music /data/music --vfs-cache-mode full --allow-other &
+rclone mount supabase:music /data/music \
+  --vfs-cache-mode full \
+  --allow-other \
+  --uid 1000 \
+  --gid 1000 \
+  --umask 000 &
 
 # Give it a few seconds to initialize the cloud handshake
 sleep 5
