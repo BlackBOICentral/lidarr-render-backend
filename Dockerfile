@@ -1,6 +1,12 @@
 FROM linuxserver/lidarr:latest
 
-# Expose Lidarr's standard operating port
-EXPOSE 8686
+USER root
+# Install rclone, bash, and ffmpeg for the automation scripts
+RUN apk add --no-cache bash rclone ffmpeg curl
 
-# Volumes will be handled via Render's mount points or ephemeral syncs
+# Copy our automation scripts
+COPY run.sh /run.sh
+COPY auto-artwork.sh /scripts/auto-artwork.sh
+RUN chmod +x /run.sh /scripts/auto-artwork.sh
+
+ENTRYPOINT ["/run.sh"]
