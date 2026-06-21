@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Ensure config directories exist
+# Ensure config and our target music directory exist
 mkdir -p ~/.config/rclone/
+mkdir -p /config/music
 
 # Write out our S3 connection profile
 cat <<EOF > ~/.config/rclone/rclone.conf
@@ -14,11 +15,11 @@ endpoint = https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1/s3
 region = us-east-1
 EOF
 
-# Use WebDAV server proxy instead of mount to bypass user permissions completely
-echo "--> Starting internal WebDAV server for Lidarr..."
-rclone serve webdav supabase:music --addr 127.0.0.1:8081 --vfs-cache-mode full &
+# Mount the Supabase bucket directly into our writable config folder
+echo "--> Mounting Supabase cloud storage to local directory..."
+rclone mount supabase:music /config/music --vfs-cache-mode full --allow-other &
 
-# Give it a few seconds to initialize
+# Give it a few seconds to initialize the cloud handshake
 sleep 5
 
 echo "--> Launching Lidarr automation suite..."
